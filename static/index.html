@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HR SaaS — Multi-Tenant Employee Management</title>
+    <meta name="description" content="Multi-tenant HR SaaS demo — organization-level employee data isolation">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏢</text></svg>">
+</head>
+
+<body>
+    <div class="app-container">
+
+        <!-- ═══ Sidebar ═══ -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <div class="logo-icon">HR</div>
+                    <h1>TenantHR</h1>
+                </div>
+
+                <!-- Company Switcher -->
+                <div class="org-switcher">
+                    <select id="orgSelect" aria-label="Switch Company">
+                        <option value="">Loading companies...</option>
+                    </select>
+                    <div id="orgPlanBadge" class="org-plan-badge"></div>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="nav-section-label">Overview</div>
+                <div class="nav-item active" data-tab="dashboard" onclick="switchTab('dashboard')">
+                    <span class="nav-icon">📊</span>
+                    <span>Dashboard</span>
+                </div>
+
+                <div class="nav-section-label">People</div>
+                <div class="nav-item" data-tab="employees" onclick="switchTab('employees')">
+                    <span class="nav-icon">👥</span>
+                    <span>Employees</span>
+                    <span class="nav-badge" id="empCount">-</span>
+                </div>
+                <div class="nav-item" data-tab="attendance" onclick="switchTab('attendance')">
+                    <span class="nav-icon">📋</span>
+                    <span>Attendance</span>
+                </div>
+                <div class="nav-item" data-tab="leaves" onclick="switchTab('leaves')">
+                    <span class="nav-icon">🏖️</span>
+                    <span>Leave Requests</span>
+                    <span class="nav-badge" id="leaveCount">-</span>
+                </div>
+
+                <div class="nav-section-label">System</div>
+                <div class="nav-item" data-tab="schema" onclick="switchTab('schema')">
+                    <span class="nav-icon">🗄️</span>
+                    <span>Schema Info</span>
+                </div>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="tenant-info">
+                    <span class="dot"></span>
+                    <span>Tenant isolation active</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- ═══ Main Content ═══ -->
+        <main class="main-content">
+
+            <!-- Isolation Banner -->
+            <div class="isolation-banner" id="isolationBanner">
+                <div class="banner-icon">🔒</div>
+                <div class="banner-text">
+                    <h4>Multi-Tenant Data Isolation Active</h4>
+                    <p>You're viewing HR data for <strong id="bannerOrgName">—</strong>. Switch companies to see
+                        completely different employee data.</p>
+                </div>
+            </div>
+
+            <!-- ═══ Dashboard Tab ═══ -->
+            <div class="tab-content active" id="tab-dashboard">
+                <div class="page-header">
+                    <div>
+                        <h2>HR Dashboard</h2>
+                        <p>People overview for <span id="dashOrgName">your company</span></p>
+                    </div>
+                </div>
+
+                <div class="stats-grid" id="statsGrid">
+                    <div class="stat-card animate-in">
+                        <div class="stat-icon blue">👥</div>
+                        <div class="stat-value" id="statEmployees">-</div>
+                        <div class="stat-label">Total Employees</div>
+                    </div>
+                    <div class="stat-card animate-in">
+                        <div class="stat-icon emerald">✅</div>
+                        <div class="stat-value" id="statActive">-</div>
+                        <div class="stat-label">Active Employees</div>
+                    </div>
+                    <div class="stat-card animate-in">
+                        <div class="stat-icon amber">🏖️</div>
+                        <div class="stat-value" id="statOnLeave">-</div>
+                        <div class="stat-label">On Leave</div>
+                    </div>
+                    <div class="stat-card animate-in">
+                        <div class="stat-icon purple">💰</div>
+                        <div class="stat-value" id="statAvgSalary">-</div>
+                        <div class="stat-label">Avg. Salary</div>
+                    </div>
+                </div>
+
+                <div class="charts-grid">
+                    <div class="chart-card animate-in">
+                        <h3>Department Distribution</h3>
+                        <div class="bar-chart" id="deptChart"></div>
+                    </div>
+                    <div class="chart-card animate-in">
+                        <h3>Today's Attendance</h3>
+                        <div class="priority-grid" id="attendanceChart"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══ Employees Tab ═══ -->
+            <div class="tab-content" id="tab-employees">
+                <div class="page-header">
+                    <div>
+                        <h2>Employees</h2>
+                        <p>Employee directory — scoped to current company</p>
+                    </div>
+                </div>
+                <div class="data-section">
+                    <div class="data-header">
+                        <h3>All Employees</h3>
+                        <span class="record-count" id="empRecordCount">0 records</span>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Department</th>
+                                <th>Position</th>
+                                <th>Status</th>
+                                <th>Org ID</th>
+                            </tr>
+                        </thead>
+                        <tbody id="empTableBody">
+                            <tr>
+                                <td colspan="7" class="empty-state">
+                                    <p>Loading...</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ═══ Attendance Tab ═══ -->
+            <div class="tab-content" id="tab-attendance">
+                <div class="page-header">
+                    <div>
+                        <h2>Attendance</h2>
+                        <p>Attendance records — scoped to current company</p>
+                    </div>
+                </div>
+                <div class="data-section">
+                    <div class="data-header">
+                        <h3>Recent Attendance</h3>
+                        <span class="record-count" id="attRecordCount">0 records</span>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Employee</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Check In</th>
+                                <th>Check Out</th>
+                                <th>Org ID</th>
+                            </tr>
+                        </thead>
+                        <tbody id="attTableBody">
+                            <tr>
+                                <td colspan="7" class="empty-state">
+                                    <p>Loading...</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ═══ Leave Requests Tab ═══ -->
+            <div class="tab-content" id="tab-leaves">
+                <div class="page-header">
+                    <div>
+                        <h2>Leave Requests</h2>
+                        <p>Leave management — scoped to current company</p>
+                    </div>
+                </div>
+                <div class="data-section">
+                    <div class="data-header">
+                        <h3>All Leave Requests</h3>
+                        <span class="record-count" id="leaveRecordCount">0 records</span>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Employee</th>
+                                <th>Type</th>
+                                <th>From</th>
+                                <th>To</th>
+                                <th>Reason</th>
+                                <th>Status</th>
+                                <th>Org ID</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leaveTableBody">
+                            <tr>
+                                <td colspan="8" class="empty-state">
+                                    <p>Loading...</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ═══ Schema Tab ═══ -->
+            <div class="tab-content" id="tab-schema">
+                <div class="page-header">
+                    <div>
+                        <h2>Schema & Architecture</h2>
+                        <p>How multi-tenant HR data isolation works</p>
+                    </div>
+                </div>
+
+                <div class="charts-grid" style="grid-template-columns: 1fr">
+                    <div class="chart-card">
+                        <h3>🏗️ Multi-Tenant HR Architecture</h3>
+                        <div style="color: var(--text-secondary); font-size: 13px; line-height: 1.8; margin-top: 8px;">
+                            <p><strong style="color: var(--accent-blue);">Why Multi-Tenancy in HR?</strong> — Every
+                                company's employee data (salaries, attendance, leaves) is extremely sensitive. In a SaaS
+                                like BambooHR or Gusto, each company must <strong
+                                    style="color: var(--accent-rose);">never</strong> see another company's data.</p>
+                            <br>
+                            <p><strong style="color: var(--accent-purple);">Row-Level Isolation</strong> — Every table
+                                has an <code
+                                    style="background: var(--bg-glass); padding: 2px 6px; border-radius: 4px; color: var(--accent-emerald); font-size: 12px;">org_id</code>
+                                column. A single middleware extracts the <code
+                                    style="background: var(--bg-glass); padding: 2px 6px; border-radius: 4px; color: var(--accent-amber); font-size: 12px;">X-Org-Id</code>
+                                header and all queries filter by it.</p>
+                            <br>
+                            <p><strong style="color: var(--accent-emerald);">How it works:</strong></p>
+                            <ol style="margin-left: 20px; margin-top: 8px;">
+                                <li>Frontend sends <code
+                                        style="background: var(--bg-glass); padding: 2px 6px; border-radius: 4px; color: var(--accent-amber); font-size: 12px;">X-Org-Id: 1</code>
+                                    (TechVista) or <code
+                                        style="background: var(--bg-glass); padding: 2px 6px; border-radius: 4px; color: var(--accent-amber); font-size: 12px;">X-Org-Id: 2</code>
+                                    (Bloom Health)</li>
+                                <li>Middleware validates & sets <code
+                                        style="background: var(--bg-glass); padding: 2px 6px; border-radius: 4px; color: var(--accent-amber); font-size: 12px;">request.state.org_id</code>
+                                </li>
+                                <li>Every query: <code
+                                        style="background: var(--bg-glass); padding: 2px 6px; border-radius: 4px; color: var(--accent-emerald); font-size: 12px;">SELECT * FROM employees WHERE org_id = :org_id</code>
+                                </li>
+                                <li>TechVista's salaries are <strong
+                                        style="color: var(--accent-rose);">invisible</strong> to Bloom Health — complete
+                                    isolation!</li>
+                            </ol>
+                            <br>
+                            <p><strong style="color: var(--accent-amber);">Used by:</strong> BambooHR, Gusto, Rippling,
+                                Workday, and every HR SaaS product.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="data-section" style="margin-top: 16px;">
+                    <div class="data-header">
+                        <h3>Database Schema</h3>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Table</th>
+                                <th>Tenant Key</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code style="color: var(--accent-blue);">organizations</code></td>
+                                <td><span class="status-badge active">Root table</span></td>
+                                <td>Company registry — each row is one tenant company</td>
+                            </tr>
+                            <tr>
+                                <td><code style="color: var(--accent-purple);">employees</code></td>
+                                <td><code style="color: var(--accent-emerald);">org_id → organizations.id</code></td>
+                                <td>Employee directory, salaries, departments — scoped per company</td>
+                            </tr>
+                            <tr>
+                                <td><code style="color: var(--accent-purple);">attendance</code></td>
+                                <td><code style="color: var(--accent-emerald);">org_id → organizations.id</code></td>
+                                <td>Daily check-in/check-out records — scoped per company</td>
+                            </tr>
+                            <tr>
+                                <td><code style="color: var(--accent-purple);">leave_requests</code></td>
+                                <td><code style="color: var(--accent-emerald);">org_id → organizations.id</code></td>
+                                <td>Leave applications with approval status — scoped per company</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+
+</html>
