@@ -3,3 +3,6 @@ uvicorn[standard]==0.30.0
 sqlalchemy[asyncio]==2.0.35
 asyncpg==0.29.0
 python-dotenv==1.0.1
+pyjwt==2.9.0
+passlib[bcrypt]==1.7.4
+bcrypt==4.2.0

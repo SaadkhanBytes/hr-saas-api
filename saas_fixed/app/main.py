@@ -9,11 +9,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from app.middleware import TenantMiddleware
 from app.seed import seed_database
-from app.routes import orgs
-from app.routes import users as employees_routes
-from app.routes import projects as attendance_routes
-from app.routes import tasks as leaves_routes
-from app.routes import stats
+from app.routes import orgs, auth, employees, attendance, leaves, stats
 
 
 @asynccontextmanager
@@ -35,9 +31,10 @@ app.add_middleware(TenantMiddleware)
 
 # ── Routes ─────────────────────────────────────────────
 app.include_router(orgs.router)
-app.include_router(employees_routes.router)
-app.include_router(attendance_routes.router)
-app.include_router(leaves_routes.router)
+app.include_router(auth.router)
+app.include_router(employees.router)
+app.include_router(attendance.router)
+app.include_router(leaves.router)
 app.include_router(stats.router)
 
 # ── Static Files ───────────────────────────────────────

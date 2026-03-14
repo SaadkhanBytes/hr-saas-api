@@ -1,13 +1,12 @@
 """
 SQLAlchemy models for Multi-Tenant HR SaaS.
 Every table (except organizations) has an org_id FK — the tenant isolation key.
-Each organization = one company with its own employees, departments, attendance, leave.
 """
 
 from datetime import datetime, date
 from sqlalchemy import (
     Column, Integer, String, Text, DateTime, Date, Float,
-    ForeignKey, Enum as SAEnum, Boolean
+    ForeignKey, Enum as SAEnum, UniqueConstraint
 )
 from sqlalchemy.orm import DeclarativeBase, relationship
 import enum
@@ -16,8 +15,6 @@ import enum
 class Base(DeclarativeBase):
     pass
 
-
-# ── Enums ──────────────────────────────────────────────
 
 class PlanType(str, enum.Enum):
     FREE = "free"
@@ -56,6 +53,10 @@ class EmployeeRole(str, enum.Enum):
     CXO = "cxo"
 
 
+# Roles allowed to perform write/admin actions
+ADMIN_ROLES = {EmployeeRole.MANAGER, EmployeeRole.DIRECTOR, EmployeeRole.VP, EmployeeRole.CXO}
+
+
 class AttendanceStatus(str, enum.Enum):
     PRESENT = "present"
     ABSENT = "absent"
@@ -80,8 +81,6 @@ class LeaveStatus(str, enum.Enum):
     CANCELLED = "cancelled"
 
 
-# ── Models ─────────────────────────────────────────────
-
 class Organization(Base):
     __tablename__ = "organizations"
 
@@ -92,7 +91,6 @@ class Organization(Base):
     industry = Column(String(100), default="")
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
-    # Relationships
     employees = relationship("Employee", back_populates="organization", cascade="all, delete-orphan")
     attendance_records = relationship("Attendance", back_populates="organization", cascade="all, delete-orphan")
     leave_requests = relationship("LeaveRequest", back_populates="organization", cascade="all, delete-orphan")
@@ -100,11 +98,16 @@ class Organization(Base):
 
 class Employee(Base):
     __tablename__ = "employees"
+    __table_args__ = (
+        # FIX: unique email per org prevents duplicate login ambiguity
+        UniqueConstraint("org_id", "email", name="uq_employee_org_email"),
+    )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     org_id = Column(Integer, ForeignKey("organizations.id", ondelete="CASCADE"), nullable=False, index=True)
     name = Column(String(255), nullable=False)
-    email = Column(String(255), nullable=False)
+    email = Column(String(255), nullable=False, index=True)
+    password_hash = Column(String(255), nullable=True)
     phone = Column(String(20), default="")
     department = Column(SAEnum(Department), nullable=False)
     role = Column(SAEnum(EmployeeRole), default=EmployeeRole.MID, nullable=False)
@@ -125,7 +128,7 @@ class Attendance(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     org_id = Column(Integer, ForeignKey("organizations.id", ondelete="CASCADE"), nullable=False, index=True)
     employee_id = Column(Integer, ForeignKey("employees.id", ondelete="CASCADE"), nullable=False, index=True)
-    date = Column(Date, nullable=False)
+    date = Column(Date, nullable=False, index=True)
     status = Column(SAEnum(AttendanceStatus), default=AttendanceStatus.PRESENT, nullable=False)
     check_in = Column(String(10), default="")
     check_out = Column(String(10), default="")
