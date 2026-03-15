@@ -603,3 +603,70 @@ async function handleRegister(event) {
         btn.textContent = 'Create workspace →';
     }
 }
+
+// Register / Login Screen Toggle
+function showRegister() {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('registerScreen').style.display = 'flex';
+}
+
+function showLogin() {
+    document.getElementById('registerScreen').style.display = 'none';
+    document.getElementById('loginScreen').style.display = 'flex';
+}
+
+function autoSlug() {
+    const name = document.getElementById('regOrgName').value;
+    const slug = name.toLowerCase().trim()
+        .replace(/[^a-z0-9\s-]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-');
+    document.getElementById('regSlug').value = slug;
+}
+
+async function handleRegister(event) {
+    event.preventDefault();
+    const btn = document.getElementById('registerBtn');
+    const errEl = document.getElementById('registerError');
+    errEl.style.display = 'none';
+    btn.disabled = true;
+    btn.textContent = 'Creating workspace...';
+
+    try {
+        const res = await fetch('/api/organizations/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                org_name: document.getElementById('regOrgName').value,
+                org_slug: document.getElementById('regSlug').value,
+                admin_name: document.getElementById('regName').value,
+                email: document.getElementById('regEmail').value,
+                password: document.getElementById('regPassword').value,
+            })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+            errEl.textContent = data.detail || 'Registration failed';
+            errEl.style.display = 'block';
+            return;
+        }
+
+        localStorage.setItem('token', data.access_token);
+        localStorage.setItem('orgId', data.org_id);
+        localStorage.setItem('orgName', data.org_name);
+        localStorage.setItem('employeeName', data.employee_name);
+        localStorage.setItem('employeeRole', data.employee_role);
+
+        document.getElementById('registerScreen').style.display = 'none';
+        await initDashboard();
+
+    } catch (err) {
+        errEl.textContent = 'Network error — please try again';
+        errEl.style.display = 'block';
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Create workspace';
+    }
+}
