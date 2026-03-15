@@ -9,6 +9,28 @@ from datetime import date
 
 # ── Auth ───────────────────────────────────────────────
 
+class RegisterRequest(BaseModel):
+    org_name: str = Field(..., min_length=2, max_length=255)
+    org_slug: str = Field(..., min_length=2, max_length=100, pattern=r"^[a-z0-9\-]+$")
+    admin_name: str = Field(..., min_length=2, max_length=255)
+    email: str
+    password: str = Field(..., min_length=6)
+    industry: str = ""
+
+    @field_validator("email")
+    @classmethod
+    def validate_email(cls, v: str) -> str:
+        v = v.strip().lower()
+        if "@" not in v or "." not in v.split("@")[-1]:
+            raise ValueError("Invalid email address")
+        return v
+
+    @field_validator("org_slug")
+    @classmethod
+    def validate_slug(cls, v: str) -> str:
+        return v.strip().lower()
+
+
 class LoginRequest(BaseModel):
     email: str
     password: str
