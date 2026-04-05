@@ -31,6 +31,7 @@ A multi-tenant HR management REST API built with **FastAPI**, **PostgreSQL**, an
 ---
 
 ## Project Structure
+```
 hr-saas-api/
 ├── app/
 │   ├── main.py          # App entry point, middleware, routers
@@ -42,21 +43,21 @@ hr-saas-api/
 │   ├── limiter.py       # SlowAPI rate limiter instance
 │   ├── seed.py          # Database seed data
 │   └── routes/
-│       ├── auth.py          # Login, forgot/reset password
-│       ├── orgs.py          # Organization registration & listing
-│       ├── employees.py     # Employee CRUD
-│       ├── attendance.py    # Attendance tracking
-│       ├── leaves.py        # Leave requests
-│       └── stats.py         # HR statistics
+│       ├── auth.py
+│       ├── orgs.py
+│       ├── employees.py
+│       ├── attendance.py
+│       ├── leaves.py
+│       └── stats.py
 ├── static/
 │   ├── index.html
 │   ├── css/style.css
 │   └── js/app.js
-├── create_db.py         # Database creation script
+├── create_db.py
 ├── requirements.txt
 ├── .env.example
 └── .gitignore
-
+```
 
 ---
 
