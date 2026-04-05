@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Multi-Tenant HR Management SaaS — Manage employees, attendance, and leave requests">
+    <title>HR SaaS — Multi-Tenant HR Management</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+<!-- Toast Container -->
+<div id="toastContainer" class="toast-container"></div>
+
+<!-- ═══════════ LOGIN SCREEN ═══════════ -->
+<div id="loginScreen" class="auth-wrapper">
+    <div class="auth-card">
+        <div class="auth-logo">
+            <h1>⚡ HR SaaS</h1>
+            <p>Multi-Tenant HR Management</p>
+        </div>
+        <h2>Sign In</h2>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="loginEmail">Email</label>
+                <input type="email" id="loginEmail" placeholder="your@email.com" required>
+            </div>
+            <div class="form-group">
+                <label for="loginPassword">Password</label>
+                <input type="password" id="loginPassword" placeholder="••••••••" required>
+            </div>
+            <button type="submit" class="btn btn-primary btn-full">Sign In</button>
+        </form>
+
+        <div class="demo-accounts">
+            <p>Demo Accounts</p>
+            <button type="button" class="demo-btn" onclick="fillLogin('sarah@techvista.io')">
+                <span class="demo-org">TechVista Solutions</span><br>
+                <span class="demo-email">sarah@techvista.io — CXO</span>
+            </button>
+            <button type="button" class="demo-btn" onclick="fillLogin('luna@bloomhealth.com')">
+                <span class="demo-org">Bloom Health Clinic</span><br>
+                <span class="demo-email">luna@bloomhealth.com — Director</span>
+            </button>
+            <button type="button" class="demo-btn" onclick="fillLogin('alex@novatech.com')">
+                <span class="demo-org">NovaTech Manufacturing</span><br>
+                <span class="demo-email">alex@novatech.com — VP</span>
+            </button>
+        </div>
+
+        <div class="auth-link">
+            <a href="#" onclick="showForgotScreen(); return false;">Forgot password?</a>
+            <br>
+            <a href="#" onclick="showRegisterScreen(); return false;">Register your company</a>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════ REGISTER SCREEN ═══════════ -->
+<div id="registerScreen" class="auth-wrapper hidden">
+    <div class="auth-card">
+        <div class="auth-logo">
+            <h1>⚡ HR SaaS</h1>
+            <p>Create your organization</p>
+        </div>
+        <h2>Register</h2>
+        <form id="registerForm">
+            <div class="form-group">
+                <label for="regCompanyName">Company Name</label>
+                <input type="text" id="regCompanyName" placeholder="Your Company Inc." required>
+            </div>
+            <div class="form-group">
+                <label for="regSlug">Slug</label>
+                <input type="text" id="regSlug" placeholder="your-company" required>
+            </div>
+            <div class="form-group">
+                <label for="regAdminName">Your Full Name</label>
+                <input type="text" id="regAdminName" placeholder="Jane Doe" required>
+            </div>
+            <div class="form-group">
+                <label for="regAdminEmail">Email</label>
+                <input type="email" id="regAdminEmail" placeholder="you@company.com" required>
+            </div>
+            <div class="form-group">
+                <label for="regAdminPassword">Password</label>
+                <input type="password" id="regAdminPassword" placeholder="Min 6 characters" required minlength="6">
+            </div>
+            <button type="submit" class="btn btn-primary btn-full">Register Organization</button>
+        </form>
+        <div class="auth-link">
+            Already have an account? <a href="#" onclick="showLoginScreen(); return false;">Sign In</a>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════ FORGOT PASSWORD SCREEN ═══════════ -->
+<div id="forgotScreen" class="auth-wrapper hidden">
+    <div class="auth-card">
+        <div class="auth-logo">
+            <h1>⚡ HR SaaS</h1>
+            <p>Reset your password</p>
+        </div>
+        <h2>Forgot Password</h2>
+        <p style="font-size:0.9rem;color:var(--text-secondary);margin-bottom:1.5rem;">
+            Enter your email and we'll send you a reset link.
+        </p>
+        <form id="forgotForm">
+            <div class="form-group">
+                <label for="forgotEmail">Email</label>
+                <input type="email" id="forgotEmail" placeholder="your@email.com" required>
+            </div>
+            <button type="submit" class="btn btn-primary btn-full">Send Reset Link</button>
+        </form>
+        <div class="auth-link">
+            <a href="#" onclick="showLoginScreen(); return false;">Back to Sign In</a>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════ RESET PASSWORD SCREEN ═══════════ -->
+<div id="resetScreen" class="auth-wrapper hidden">
+    <div class="auth-card">
+        <div class="auth-logo">
+            <h1>⚡ HR SaaS</h1>
+            <p>Choose a new password</p>
+        </div>
+        <h2>Reset Password</h2>
+        <form id="resetForm">
+            <div class="form-group">
+                <label for="resetToken">Reset Token</label>
+                <input type="text" id="resetToken" placeholder="Paste token from email" required>
+            </div>
+            <div class="form-group">
+                <label for="resetNewPassword">New Password</label>
+                <input type="password" id="resetNewPassword" placeholder="Min 8 characters"
+                       required minlength="8">
+            </div>
+            <div class="form-group">
+                <label for="resetConfirmPassword">Confirm New Password</label>
+                <input type="password" id="resetConfirmPassword" placeholder="Repeat password"
+                       required minlength="8">
+            </div>
+            <button type="submit" class="btn btn-primary btn-full">Reset Password</button>
+        </form>
+        <div class="auth-link">
+            <a href="#" onclick="showLoginScreen(); return false;">Back to Sign In</a>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════ DASHBOARD ═══════════ -->
+<div id="dashboardScreen" class="dashboard hidden">
+
+    <!-- Sidebar Overlay (mobile) -->
+    <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">⚡ HR SaaS</div>
+            <div class="org-name" id="sidebarOrgName"></div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <button class="nav-item active" data-tab="dashboard">
+                <span class="nav-icon">📊</span> Dashboard
+            </button>
+            <button class="nav-item" data-tab="employees">
+                <span class="nav-icon">👥</span> Employees
+            </button>
+            <button class="nav-item" data-tab="attendance">
+                <span class="nav-icon">📋</span> Attendance
+            </button>
+            <button class="nav-item" data-tab="leaves">
+                <span class="nav-icon">🏖️</span> Leave Requests
+            </button>
+            <button class="nav-item" data-tab="schema">
+                <span class="nav-icon">🗄️</span> Schema Info
+            </button>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <div class="user-avatar" id="sidebarAvatar"></div>
+                <div class="user-details">
+                    <div class="user-name" id="sidebarUserName"></div>
+                    <div class="user-role" id="sidebarUserRole"></div>
+                </div>
+            </div>
+            <button id="logoutBtn" class="logout-btn">🚪 Sign Out</button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-content">
+
+        <!-- Topbar -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <button id="menuToggle" class="menu-toggle">☰</button>
+                <span class="page-title" id="pageTitle">Dashboard</span>
+            </div>
+            <div class="topbar-right">
+                <div class="topbar-user">
+                    <div class="topbar-avatar" id="topbarAvatar"></div>
+                    <span class="topbar-name" id="topbarName"></span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Content Area -->
+        <div class="content-area">
+
+            <!-- ── Dashboard Tab ─────────────────────── -->
+            <div id="tab-dashboard" class="tab-content active">
+                <div class="kpi-grid">
+                    <div class="kpi-card kpi-primary">
+                        <div class="kpi-icon">👥</div>
+                        <div class="kpi-value" id="kpiTotalEmployees">0</div>
+                        <div class="kpi-label">Total Employees</div>
+                    </div>
+                    <div class="kpi-card kpi-success">
+                        <div class="kpi-icon">✅</div>
+                        <div class="kpi-value" id="kpiActiveEmployees">0</div>
+                        <div class="kpi-label">Active Employees</div>
+                    </div>
+                    <div class="kpi-card kpi-info">
+                        <div class="kpi-icon">📍</div>
+                        <div class="kpi-value" id="kpiPresentToday">0</div>
+                        <div class="kpi-label">Present Today</div>
+                    </div>
+                    <div class="kpi-card kpi-warning">
+                        <div class="kpi-icon">⏳</div>
+                        <div class="kpi-value" id="kpiPendingLeaves">0</div>
+                        <div class="kpi-label">Pending Leaves</div>
+                    </div>
+                    <div class="kpi-card kpi-accent">
+                        <div class="kpi-icon">💰</div>
+                        <div class="kpi-value" id="kpiAvgSalary">$0</div>
+                        <div class="kpi-label">Avg. Salary</div>
+                    </div>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h3>Department Distribution</h3>
+                        </div>
+                        <div class="panel-body" id="deptChart"></div>
+                    </div>
+
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h3>Today's Attendance</h3>
+                        </div>
+                        <div class="panel-body">
+                            <div class="attendance-grid" id="todayAttendanceGrid"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-header">
+                        <h3>Pending Leave Requests</h3>
+                    </div>
+                    <div class="panel-body" id="pendingLeavesList"></div>
+                </div>
+            </div>
+
+            <!-- ── Employees Tab ─────────────────────── -->
+            <div id="tab-employees" class="tab-content">
+                <div class="toolbar">
+                    <h3>Employee Directory</h3>
+                    <input type="text" id="empSearch" placeholder="Search by name…"
+                           style="padding:0.45rem 0.75rem;border:1px solid var(--border);
+                                  border-radius:8px;font-size:0.9rem;width:220px;
+                                  background:var(--paper);color:var(--text);">
+                    <button id="addEmpBtn" class="btn btn-primary">+ Add Employee</button>
+                </div>
+                <div class="panel">
+                    <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Employee</th>
+                                    <th>Department</th>
+                                    <th>Role</th>
+                                    <th>Position</th>
+                                    <th>Salary</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="employeeTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── Attendance Tab ────────────────────── -->
+            <div id="tab-attendance" class="tab-content">
+                <div class="toolbar">
+                    <h3>Attendance Records</h3>
+                    <div class="filter-group">
+                        <input type="date" id="attStartDate" title="Start Date">
+                        <input type="date" id="attEndDate" title="End Date">
+                    </div>
+                </div>
+                <div class="panel">
+                    <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Employee</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                    <th>Check In</th>
+                                    <th>Check Out</th>
+                                </tr>
+                            </thead>
+                            <tbody id="attendanceTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── Leaves Tab ────────────────────────── -->
+            <div id="tab-leaves" class="tab-content">
+                <div class="toolbar">
+                    <h3>Leave Requests</h3>
+                    <div class="filter-group">
+                        <select id="leaveStatusFilter">
+                            <option value="">All Statuses</option>
+                            <option value="pending">Pending</option>
+                            <option value="approved">Approved</option>
+                            <option value="rejected">Rejected</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                        <button id="addLeaveBtn" class="btn btn-primary">+ Request Leave</button>
+                    </div>
+                </div>
+                <div class="panel">
+                    <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Employee</th>
+                                    <th>Type</th>
+                                    <th>Start</th>
+                                    <th>End</th>
+                                    <th>Reason</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="leaveTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── Schema Tab ────────────────────────── -->
+            <div id="tab-schema" class="tab-content">
+                <div class="panel">
+                    <div class="panel-header">
+                        <h3>Multi-Tenant Architecture</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="schema-section">
+                            <h3>🔑 How Multi-Tenancy Works</h3>
+                            <p>
+                                This system uses <strong>shared database, shared schema</strong> multi-tenancy.
+                                Every table has an <code>org_id</code> column that acts as a tenant discriminator.
+                                When a user logs in, their JWT token contains their <code>org_id</code>, and every
+                                API query automatically filters by that <code>org_id</code>. Company A never sees
+                                Company B's data.
+                            </p>
+                        </div>
+
+                        <div class="schema-section">
+                            <h3>📐 Database Tables</h3>
+
+                            <div class="schema-table-card">
+                                <h4>organizations</h4>
+                                <p>Root tenant table. Fields: id, name, slug (unique), plan (enum), industry, created_at</p>
+                            </div>
+
+                            <div class="schema-table-card">
+                                <h4>employees</h4>
+                                <p>Users and staff. Fields: id, org_id (FK), name, email, password_hash, phone, department, role, position, salary, status, join_date, created_at. UNIQUE(org_id, email)</p>
+                            </div>
+
+                            <div class="schema-table-card">
+                                <h4>attendance</h4>
+                                <p>Daily attendance records. Fields: id, org_id (FK), employee_id (FK), date, status, check_in, check_out, created_at</p>
+                            </div>
+
+                            <div class="schema-table-card">
+                                <h4>leave_requests</h4>
+                                <p>Leave requests with approval workflow. Fields: id, org_id (FK), employee_id (FK), leave_type, start_date, end_date, reason, status, created_at</p>
+                            </div>
+                        </div>
+
+                        <div class="schema-section">
+                            <h3>🛡️ Security Model</h3>
+                            <p>
+                                <strong>JWT Tokens</strong> contain employee_id, org_id, email, and role.
+                                The <code>get_current_user</code> dependency validates the token and verifies the employee
+                                exists with matching employee_id AND org_id. The <code>TenantMiddleware</code> sets
+                                <code>request.state.org_id</code> before any route handler runs.
+                                Admin operations (create/edit/delete employees, approve leaves) require roles:
+                                manager, director, vp, or cxo.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- /content-area -->
+    </div><!-- /main-content -->
+</div><!-- /dashboard -->
+
+<!-- ═══════════ MODALS ═══════════ -->
+
+<!-- Employee Modal -->
+<div id="empModal" class="modal-overlay hidden">
+    <div class="modal">
+        <h3 id="empModalTitle">Add Employee</h3>
+        <form id="empForm">
+            <input type="hidden" id="empModalId">
+            <div class="form-group">
+                <label for="empName">Full Name</label>
+                <input type="text" id="empName" required>
+            </div>
+            <div class="form-group">
+                <label for="empEmail">Email</label>
+                <input type="email" id="empEmail" required>
+            </div>
+            <div class="form-group" id="empPasswordGroup">
+                <label for="empPassword">Password</label>
+                <input type="password" id="empPassword" minlength="6">
+            </div>
+            <div class="form-group">
+                <label for="empPhone">Phone</label>
+                <input type="text" id="empPhone">
+            </div>
+            <div class="form-group">
+                <label for="empDepartment">Department</label>
+                <select id="empDepartment" required>
+                    <option value="engineering">Engineering</option>
+                    <option value="design">Design</option>
+                    <option value="marketing">Marketing</option>
+                    <option value="sales">Sales</option>
+                    <option value="hr">HR</option>
+                    <option value="finance">Finance</option>
+                    <option value="operations">Operations</option>
+                    <option value="support">Support</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="empRole">Role</label>
+                <select id="empRole" required>
+                    <option value="intern">Intern</option>
+                    <option value="junior">Junior</option>
+                    <option value="mid">Mid</option>
+                    <option value="senior">Senior</option>
+                    <option value="lead">Lead</option>
+                    <option value="manager">Manager</option>
+                    <option value="director">Director</option>
+                    <option value="vp">VP</option>
+                    <option value="cxo">CXO</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="empPosition">Position</label>
+                <input type="text" id="empPosition">
+            </div>
+            <div class="form-group">
+                <label for="empSalary">Salary</label>
+                <input type="number" id="empSalary" step="0.01">
+            </div>
+            <div class="form-group">
+                <label for="empStatus">Status</label>
+                <select id="empStatus">
+                    <option value="active">Active</option>
+                    <option value="on_leave">On Leave</option>
+                    <option value="terminated">Terminated</option>
+                    <option value="probation">Probation</option>
+                </select>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-outline" onclick="closeModal('empModal')">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Leave Modal -->
+<div id="leaveModal" class="modal-overlay hidden">
+    <div class="modal">
+        <h3>Request Leave</h3>
+        <form id="leaveForm">
+            <div class="form-group">
+                <label for="leaveType">Leave Type</label>
+                <select id="leaveType" required>
+                    <option value="sick">Sick</option>
+                    <option value="casual">Casual</option>
+                    <option value="annual">Annual</option>
+                    <option value="maternity">Maternity</option>
+                    <option value="paternity">Paternity</option>
+                    <option value="unpaid">Unpaid</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="leaveStart">Start Date</label>
+                <input type="date" id="leaveStart" required>
+            </div>
+            <div class="form-group">
+                <label for="leaveEnd">End Date</label>
+                <input type="date" id="leaveEnd" required>
+            </div>
+            <div class="form-group">
+                <label for="leaveReason">Reason</label>
+                <input type="text" id="leaveReason" placeholder="Optional">
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-outline" onclick="closeModal('leaveModal')">Cancel</button>
+                <button type="submit" class="btn btn-primary">Submit Request</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="/static/js/app.js"></script>
+</body>
+</html>
